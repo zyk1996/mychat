@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="js/jquery.js" th:src="@{js/jquery.js}"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js" th:src="@{js/bootstrap.min.js}"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css" th:href="@{css/bootstrap.min.css}"/>
+    <link href="images/a.ico" rel="icon" type="image/x-icon" th:href="@{images/a.ico}"/>
+    <title th:replace="${title}">mychat</title>
+</head>
+<body>
+<div  style="position:absolute; width:100%; height:100%; z-index:-1" id="bgDiv" >
+    <img src="images/bg.jpg" height="100%" width="100%" th:src="@{images/bg.jpg}"/>
+</div>
+</body>
+</html>
