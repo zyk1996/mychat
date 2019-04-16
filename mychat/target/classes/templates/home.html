@@ -1,11 +1,285 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="common::head(~{::#title})">
-    <title id="title">mychat</title>
+    <title id="title">唠唠嗑</title>
+
 </head>
+
 <body>
 <div th:replace="common::#bgDiv"></div>
 
-<div class="container"><h3>hello</h3></div>
+<div class="container"  style="height: 790px">
+
+    <div class="row" style="height:100%">
+
+        <div id="left" class="col col-md-3 col-xs-3 col-sm-3" style="background-color: #999999;height: 100%" >
+
+            <div id="infoAndAdd" clsss="row">
+                <div id="info" class="col col-md-9 col-xs-9 col-sm-9" style="padding-left: 0px">
+                    <a th:href="@{/user/info(account=${session.user.account})}"><img style="width: 50px;height: 50px;" src="" alt="个人头像" class="img-rounded" th:src="${session.user.image}"></a><span th:text="${session.user.name}" style="font-size: 15px"></span>
+                </div>
+                <div id="add" class="col  col-md-3 col-xs-3 col-sm-3">
+                    <div class="btn-group" >
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" >
+                            <span class="glyphicon glyphicon-th-list" style="font-size: 25px;margin-top: 4px"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a href="/user/add" ><span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;添加朋友</a></li>
+                            <li><a href="/room/add" ><span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;添加群聊</a></li>
+                            <li><a href="/room/create" ><span class="glyphicon glyphicon-send"></span>&nbsp;&nbsp;创建群聊</a></li>
+                            <li><a href="/user/logout" ><span class="glyphicon glyphicon-off"></span>&nbsp;&nbsp;注销登录</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="search" class="row" >
+                <div  class="input-group" style="width: 100%;padding-top: 20px">
+                    <input type="text" class="form-control" placeholder="search" >
+                    <span id="searchBtn" class="input-group-addon glyphicon glyphicon-search" ></span>
+                </div>
+            </div>
+
+            <div id="menu" class="row">
+                <div class="btn-group btn-group-justified" style="width: 100%;padding-top: 10px">
+                    <a id="messagesBtn" type="button" class="btn btn-default"  title="消息"><span class="glyphicon glyphicon-comment" ></span></a>
+                    <a id="friendsBtn" type="button" class="btn btn-default"  title="朋友"><span class="glyphicon glyphicon-user" ></span></a>
+                    <a id="friendspaceBtn" type="button" class="btn btn-default"  title="朋友圈"><span class="glyphicon glyphicon-cloud" ></span></a>
+                    <a id="newsBtn" type="button" class="btn btn-default"  title="新闻"><span class="glyphicon glyphicon-globe" ></span></a>
+                </div>
+
+            </div>
+
+            <div id="result" class="row">
+                <ul class="list-group" id="messages"></ul>
+                <ul class="list-group" id="friends"></ul>
+                <ul class="list-group" id="friendspace"></ul>
+                <ul class="list-group" id="news"></ul>
+
+            </div>
+        </div>
+
+        <div id="right" class="col col-md-9 col-xs-9 col-sm-9" style="background-color: #dddddd;height:100%">
+            <div id="name" style="text-align: center;font-size: large"><span flag="span">详细信息</span> <span flag="toggle" class="glyphicon glyphicon-menu-down"></span></div>
+            <hr/>
+            <div style="height: 500px">
+                <div flag="img" style="height: 200px;overflow-y: auto;">
+                </div>
+                <div flag="message" style="height: 300px;overflow-y: auto"></div>
+            </div>
+            <hr/>
+            <div id="action">
+                <span class="glyphicon glyphicon-gift" style="font-size: 25px"></span>&nbsp;&nbsp;
+                <span class="glyphicon glyphicon-folder-open" style="font-size: 25px"></span>&nbsp;&nbsp;
+                <span class="glyphicon glyphicon-earphone" style="font-size: 25px"></span>&nbsp;&nbsp;
+                <span class="glyphicon glyphicon-facetime-video" style="font-size: 25px"></span>&nbsp;&nbsp;
+                <br/>
+                <textarea flag="content" style="background-color: #dddddd;width: 100%;height: 100px;border-color:#dddddd ;"></textarea>
+                <br/>
+                <button class="btn btn-success col-md-offset-11" id="sendMessageBtn">发送</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
 </body>
+<script th:inline="javascript">
+    $(function () {
+        var errorMSG="服务器繁忙，请稍后再试";
+        var account=[[${session.user.account}]];
+        var user=[[${session.user}]];
+        $("#sendMessageBtn").click(function () {
+            if(typeof($(this).attr("accountFrom"))=="undefined"){
+                alert("发送消息之前请先选定朋友或群聊");
+            }else{
+                var textarea=$("#right [flag='content']");
+                if(textarea.val()==""){
+                    alert("不能发送内容为空的消息");
+                }else{
+                    var message={};
+                    message.accountFrom=$(this).attr("accountFrom");
+                    message.accountTo=$(this).attr("accountTo");
+                    message.content=textarea.val();
+                    message.type=$(this).attr("type");
+                    message.flagRoom=$(this).attr("flagRoom");
+                    if(typeof ($("#sendMessageBtn").attr("room"))=="undefined"){
+                    }else{
+                        message.room=$(this).attr("room");
+                    }
+                    console.log(message);
+                    $.ajax({
+                        url:"/sendMessage",
+                        data:message,
+                        success:function (result) {
+                           if(result.code==200){
+                               var p=$("<p style='text-align: right'></p>");
+                               var img=$("<img style='width: 50px;height: 50px'></img>").attr("src",user.image).attr("alt","头像");
+                               var span=$("<span></span>").text(result.hashMap.message);
+                               p.append(span).append(img);
+                               $("#right [flag='message']").append(p);
+                               $("#right [flag='content']").val("");
+                           }else{
+                               alert(errorMSG);
+                           }
+                        }
+                    });
+
+                }
+
+
+            }
+        });
+        var ws = new WebSocket("ws://localhost:8080/websocket/"+account);
+        $("#friendsBtn").click(function () {
+            $("#friends").empty();
+            $.ajax({
+                url:"/user/getRoomsAndFriends/"+account,
+                success:function (result) {
+                    if(result.code==200){
+                        //console.log(result.hashMap);
+                        var target=$("#friends");
+
+                        if(result.hashMap.rooms.length>0){
+                            var span=$("<span></span>").text("群聊");
+                            target.append(span);
+                            $.each(result.hashMap.rooms,function (index,data) {
+                                var li=$("<a class='list-group-item' ></a>").attr("room",data.room);
+                                var img=$("<img style='width: 50px;height: 50px'></img>").attr("src",data.image).attr("alt","头像");
+                                var room=$("<span></span>").text(data.room);
+                                li.append(img).append("&nbsp;&nbsp;").append(room);
+
+                                li.on("click",function () {
+                                    clean();
+                                    $("#right").find("[flag='span']").text(data.room+"   "+"("+data.users.length+")");
+                                    $.each(data.users,function (index1,data1) {
+                                        var img1=$("<img style='width: 80px;height: 80px'></img>").attr("src",data1.image).attr("alt","头像");
+                                        $("#right").find("[flag='img']").append(img1);
+                                    });
+                                    $("#sendMessageBtn").attr("accountFrom",account).attr("accountTo",data.room).attr("type","0").attr("flagRoom","1").attr("room",data.room);
+
+                                });
+                                target.append(li);
+                            });
+                        }
+                        if(result.hashMap.users.length>0){
+                            var span=$("<span></span>").text("朋友");
+                            target.append(span);
+                            $.each(result.hashMap.users,function (index,data) {
+                                var li=$("<a class='list-group-item' ></a>");
+                                var img=$("<img style='width: 50px;height: 50px'></img>").attr("src",data.image).attr("alt","头像");
+                                var accountSpan=$("<span></span>").text(data.account);
+                                li.append(img).append("&nbsp;&nbsp;").append(accountSpan);
+                                li.on("click",function () {
+                                    clean();
+                                    $("#right").find("[flag='span']").text(data.account);
+                                    var img1=$("<img style='width: 80px;height: 80px'></img>").attr("src",data.image).attr("alt","头像");
+                                    $("#right").find("[flag='img']").append(img1);
+                                    $("#sendMessageBtn").attr("accountFrom",account).attr("accountTo",data.account).attr("type","0").attr("flagRoom","0");
+                                });
+                                target.append(li);
+                            });
+                        }
+                        if(result.hashMap.users.length==0&&result.hashMap.rooms.length==0){
+                            var span=$("<span></span>").text("你还未添加任何群聊和好友，快去找寻你的小伙伴吧");
+                            target.append(span);
+                        }
+                    }else{
+                        alert(errorMSG);
+                    }
+                }
+            });
+        });
+        $("#right [flag='toggle']").click(function(){
+            if($(this).hasClass("glyphicon-menu-down")){
+                $(this).removeClass("glyphicon-menu-down");
+                $(this).addClass("glyphicon-menu-up");
+                $("#right [flag='img']").toggle();
+                $("#right [flag='message']").css("height","300px");
+            }else{
+                $(this).removeClass("glyphicon-menu-up");
+                $(this).addClass("glyphicon-menu-down");
+                $("#right [flag='img']").toggle();
+                $("#right [flag='message']").css("height","500px");
+            }
+
+        });
+
+        ws.onopen = function()
+        {
+            console.log("websocket成功连接至服务器");
+
+        };
+        ws.onmessage=function (ev) {
+            var data=JSON.parse(ev.data);
+            console.log(data);
+            if($("#messages").children("a[unique='"+data.unique+"']").length>0){
+                var li=$("#messages").children("a[unique='"+data.unique+"']");
+                var cli=li.clone(true);
+                li.remove();
+                cli.find("span[point='content']").text(data.content);
+                var count=cli.find("span.badge").text();
+                cli.find("span.badge").text(parseInt(count)+1);
+                $("#messages").prepend(cli);
+            }else{
+                var li=$("<a class='list-group-item' ></a>").attr("unique",data.unique);
+                var img=$("<img style='width: 50px;height: 50px'></img>").attr("src",data.fromObject.image).attr("alt","头像");
+                var message=$("<span point='content'></span>").text(data.content);
+                var badge=$("<span class='badge'></span>").text("1");
+                var account=$("<span point='account'></span>");
+                if(data.flagRoom=="0"){
+                    account.text(data.accountFrom);
+                }else{
+                    account.text(data.room);
+                }
+                li.append(img).append("&nbsp;&nbsp;").append(account).append(badge).append("<br/>").append(message);
+                if(data.type=="1"){
+                    var btn1=$("<button class='btn btn-default'>忽略</button>");
+                    var btn2=$("<button class='btn btn-info'>同意</button>");
+                    var span=$("<span></span>");
+                    if(data.flagRoom=="0"){
+                        span.text("好友申请验证");
+                    }else{
+                        span.text("群消息验证");
+                    }
+                    btn1.on("click",function () {
+                        btn1.closest("a").remove();
+                    });
+                    btn2.on("click",function () {
+                        var userrel={};
+                        userrel.primaryAccount=data.accountFrom;
+                        userrel.secondaryAccount=data.accountTo;
+                        $.ajax({
+                            url:"/user/userrel/add",
+                            data:userrel,
+                            success:function (result) {
+                                if(result.code==200){
+                                    alert("添加好友成功");
+                                    btn2.closest("a").remove();
+                                }else{
+                                    alert(errorMSG);
+                                }
+                            }
+                        });
+                    });
+                    li.append(span).append(btn1).append(btn2);
+                }
+                $("#messages").prepend(li);
+            }
+        }
+
+    });
+    function clean(){
+        $("#right").find("[flag='span']").text("");
+        $("#right").find("[flag='img']").empty();
+        $("#right").find("[flag='message']").empty();
+        if($("#right [flag='toggle']").hasClass("glyphicon-menu-up")){
+            $("#right [flag='toggle']").removeClass("glyphicon-menu-up");
+            $("#right [flag='toggle']").addClass("glyphicon-menu-down");
+        }
+        $("#right [flag='message']").css("height","500px");
+        $("#right").find("[flag='img']").hide();
+        $("#sendMessageBtn").removeAttr("accountFrom").removeAttr("accountTo").removeAttr("type").removeAttr("flagRoom").removeAttr("room");
+    }
+</script>
 </html>

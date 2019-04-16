@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common::head(~{::#title})">
+    <title id="title">出错啦</title>
+
+</head>
+<body>
+<div th:replace="common::#bgDiv"></div>
+
+<div class="container" id="container" style="height: 750px">
+
+    <div class="row" style="height:100%">
+        <div >
+            <h3 class="page-header">出错啦，唠嗑君正在努力修复ing...<span id="curr">10</span>秒后自动跳转<a class="col-md-offset-6" th:href="@{${exception.url}}" th:if="${exception.url}">返回</a></h3>
+            <p style="font-size: 20px" th:if="${exception.code}"><span>错误Code为：</span><span th:text="${exception.code}"></span></p>
+            <p style="font-size: 20px"><span>错误信息为：</span><span th:text="${exception.message}"></span></p>
+        </div>
+
+
+
+    </div>
+
+</div>
+</body>
+<script th:inline="javascript">
+    $(function ($) {
+        setInterval("change()",1000);
+        setTimeout("forward()",10000);
+    });
+    function forward(){
+        var url=[[${exception.url}]];
+        if(!$.isEmptyObject(url)){
+            window.location.href=url;
+        }
+
+    }
+    function change(){
+        var curr=parseInt($("#curr").text());
+        if(curr>0){
+            $("#curr").text(curr-1);
+        }
+    }
+</script>
+</html>

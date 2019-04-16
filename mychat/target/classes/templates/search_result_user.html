@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common::head(~{::#title})">
+    <title id="title">搜索结果</title>
+
+
+</head>
+<style>
+    .jumbotron img{
+        width: 100px;
+        height: 100px;
+    }
+</style>
+
+<body>
+<div th:replace="common::#bgDiv"></div>
+
+<div class="container" style="height: 700px">
+    <div class="row">
+        <div class="col col-md-6 col-sm-6 col-xs-6">
+            <p class="lead">唠唠嗑 <small>找知心好友，诉说身边趣事，享受美好生活</small></p>
+        </div>
+    </div>
+
+    <div class="row" style="margin:15% auto">
+
+        <div class="jumbotron" th:if="!(${user})">
+            <h4 class="page-header" >找不到您要的结果</h4>
+        </div>
+
+        <div class="jumbotron" th:if="(!${added}) and ${user}">
+
+            <h4 class="page-header" >用户信息</h4>
+            <div>
+                <img src="" th:src="@{${user.image}}" alt="用户头像"><span th:text="${user.name}"></span>
+                <a class="btn btn-info" id="addUserBtn">申请加好友</a>
+            </div>
+
+        </div>
+
+        <div class="jumbotron" th:if="(${added}) and ${user}">
+
+            <h4 class="page-header" >用户信息</h4>
+            <div>
+                <img src="" th:src="@{${user.image}}" alt="用户头像"><span th:text="${user.name}"></span>
+                <span>提示：你已是该用户的好友，不能重复申请</span>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" id="addUserModalCloseBtn" ><span >&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-3 col-xs-3 control-label">打声招呼吧</label>
+                            <div class="col-sm-9 col-md-9 col-xs-9">
+                                <input type="text" class="form-control" placeholder="tell you who am i" name="content"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="addUserModalSubmitBtn">申请</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+</body>
+<script th:inline="javascript">
+    $(function () {
+        var errorMsg="服务器繁忙，请稍后再试";
+        var user=[[${session.user}]];
+
+        $("#addUserBtn").click(function () {
+            $("#addUserModal").modal("show");
+        });
+        $("#addUserModalCloseBtn").click(function () {
+            modalHide("#addUserModal");
+        });
+        $("#addUserModalSubmitBtn").click(function () {
+            var message={};
+            message.accountFrom=user.account;
+            message.accountTo=[[${user.account}]];
+            message.content=$("#addUserModal form input").val();
+            message.type="1";
+            message.flagRoom="0";
+            $.ajax({
+                url:"/sendMessage",
+                data:message,
+                success:function (result) {
+                    if(result.code==200){
+                        modalHide("#addUserModal");
+                    }else{
+                        alert(errorMsg);
+                    }
+                }
+            });
+        });
+
+
+    });
+    function modalHide(ele){
+        $(ele).find("form").find("input").val("");
+        $(ele).modal("hide");
+    }
+</script>
+</html>

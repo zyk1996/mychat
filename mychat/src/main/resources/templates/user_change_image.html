@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common::head(~{::#title})">
+    <title id="title">唠唠嗑</title>
+
+</head>
+
+<body>
+<div th:replace="common::#bgDiv"></div>
+<div class="container" style="height: 700px">
+    <div style="margin:10% auto" class="row">
+        <div class="col col-md-offset-5 col-sm-offset-5 col-xs-offset-5"><img src="" style="height: 300px;width: 300px" th:src="@{${session.user.image}}" alt="个人头像" class="img-thumbnail"></div>
+    </div>
+
+    <div class="row">
+        <form method="post" enctype="multipart/form-data" action="/user/updateImage" class="form-inline col-md-offset-5 col-sm-offset-5 col-xs-offset-5" >
+            <input type="file" class="form-control"  name="image" > &nbsp;&nbsp;<button class="btn btn-success" type="submit" >更换</button>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

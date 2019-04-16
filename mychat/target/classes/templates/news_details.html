@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common::head(~{::#title})">
+    <title id="title">新闻详情</title>
+
+</head>
+
+<body>
+<div th:replace="common::#bgDiv"></div>
+
+<div class="container" style="height: 700px">
+    <h3 class="page-header">
+        <span>新闻详情信息</span><small><span><a th:href="@{/news/admin}" class="col-md-offset-8">返回管理员家园</a></span></small>
+    </h3>
+
+    <div class="row">
+        <form class="form-horizontal" th:object="${news}"  method="post">
+            <div class="form-group">
+                <label class="col-sm-2 col-xs-2 col-md-2 control-label">新闻标题</label>
+                <div class="col-sm-10 col-xs-10 col-md-10">
+                    <p class="form-control-static" th:text="*{title}"></p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 col-md-2 col-xs-2 control-label">新闻时间</label>
+                <div class="col-sm-10 col-md-10 col-xs-10">
+                    <p class="form-control-static" th:text="*{date}"></p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 col-md-2 col-xs-2 control-label">发布机构</label>
+                <div class="col-sm-10 col-md-10 col-xs-10">
+                    <p class="form-control-static" th:text="*{company}"></p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 col-md-2 col-xs-2 control-label">附件信息</label>
+                <div class="col-sm-10 col-md-10 col-xs-10">
+                    <p class="form-control-static">
+                        <span th:text="无附件信息" th:if="${news.flagAttr} eq '否' "></span>
+                        <a th:text="附件" th:href="${news.attrSrc}" th:if="${news.flagAttr} eq '是' "></a>
+                    </p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 col-md-2 col-xs-2 control-label">新闻内容</label>
+                <div class="col-sm-10 col-md-10 col-xs-10">
+                    <div th:text="*{content}" style="height: 400px;width: 800px;overflow-x: hidden;overflow-y: auto">
+
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

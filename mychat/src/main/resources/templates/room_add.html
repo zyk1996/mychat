@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common::head(~{::#title})">
+    <title id="title">添加群聊</title>
+
+</head>
+
+<body>
+<div th:replace="common::#bgDiv"></div>
+
+<div class="container" style="height: 700px">
+    <div class="row">
+        <div class="col col-md-6 col-sm-6 col-xs-6">
+            <p class="lead">唠唠嗑 <small>找知心好友，诉说身边趣事，享受美好生活</small></p>
+        </div>
+    </div>
+
+    <div class="row" style="margin:15% auto">
+        <form action="/room/get" method="post"  class="form-inline col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+            <input type="text" class="form-control"  placeholder="room" name="room" style="width: 50%"> &nbsp;&nbsp;<button class="btn btn-success">搜索</button>
+        </form>
+
+    </div>
+</div>
+</body>
+</html>

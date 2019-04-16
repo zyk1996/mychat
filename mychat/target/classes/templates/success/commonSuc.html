@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common::head(~{::#title})">
+    <title id="title">操作成功</title>
+
+</head>
+<body>
+<div th:replace="common::#bgDiv"></div>
+
+<div class="container" id="container" style="height: 750px">
+
+    <div class="row" style="height:100%">
+        <div >
+            <h3 class="page-header">操作成功<span id="curr" th:text="${info.time}">10</span>秒后自动跳转<a class="col-md-offset-6" th:href="@{${info.url}}" th:if="${info.url}">跳转</a></h3>
+            <p >恭喜您：<span th:text="${info.message}">message</span></p>
+        </div>
+    </div>
+
+</div>
+</body>
+<script th:inline="javascript">
+    $(function ($) {
+        setInterval("change()",1000);
+        setTimeout("forward()",parseInt([[${info.time}]])*1000);
+    });
+    function forward(){
+        var url=[[${info.url}]];
+        if(!$.isEmptyObject(url)){
+            window.location.href=url;
+        }
+
+    }
+    function change(){
+        var curr=parseInt($("#curr").text());
+        if(curr>0){
+            $("#curr").text(curr-1);
+        }
+    }
+</script>
+</html>

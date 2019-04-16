@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common::head(~{::#title})">
+    <title id="title">后台管理</title>
+
+</head>
+
+<body>
+<div th:replace="common::#bgDiv"></div>
+
+<div class="container" style="height: 700px">
+    <h3 class="page-header">欢迎管理员登录:&nbsp;&nbsp;<small><span th:text="${session.admin.account}"></span></small>
+    <small><span><a class="col-md-offset-8 col-sm-offset-8 col-xs-offset-8" th:href="@{/admin/logout}">注销</a></span></small>
+    </h3>
+
+    <div class="row">
+        <div class="btn-group-vertical" >
+            <div class="btn-group" >
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" >
+                    新闻管理
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="#" th:href="@{/news/forward/{path}(path='add')}">发布新闻</a></li>
+                    <li><a href="#" th:href="@{/news/forward/{path}(path='select')}">查询新闻</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

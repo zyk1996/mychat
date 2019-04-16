@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common::head(~{::#title})">
+    <title id="title">新闻发布</title>
+
+</head>
+
+<body>
+<div th:replace="common::#bgDiv"></div>
+
+<div class="container" style="height: 700px">
+    <h3 class="page-header">
+        <span>新闻发布</span> <small><span><a th:href="@{/news/admin}" class="col-md-offset-8">返回管理员家园</a></span></small>
+    </h3>
+
+    <div class="row">
+        <form class="form-horizontal"  action="/news/add" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="col-sm-2 col-md-2 col-xs-2 control-label">新闻标题</label>
+                <div class="col-sm-10 col-md-10 col-xs-10">
+                    <input type="text" class="form-control" name="title">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 col-md-2 col-xs-2 control-label">新闻时间</label>
+                <div class="col-sm-10 col-md-10 col-xs-10">
+                    <input type="text" class="form-control" name="date">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 col-md-2 col-xs-2 control-label">发布机构</label>
+                <div class="col-sm-10 col-md-10 col-xs-10">
+                    <input type="text" class="form-control" name="company">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 col-md-2 col-xs-2 control-label">新闻内容</label>
+                <div class="col-sm-10 col-md-10 col-xs-10">
+                    <input type="file" class="form-control" name="contentFile">
+                    <p class="help-block">请确保新闻内容编码为utf8，否则会乱码</p>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 col-md-2 col-xs-2 control-label">新闻附件</label>
+                <div class="col-sm-10 col-md-10 col-xs-10">
+                    <input type="file" class="form-control" name="attrSrcFile">
+                    <p class="help-block">请确保新闻附件编码为utf8，否则会乱码</p>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn btn-success col-md-offset-11 col-sm-offset-11 col-xs-offset-11">发布</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

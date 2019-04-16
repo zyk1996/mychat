@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common::head(~{::#title})">
+    <title id="title">新闻查看</title>
+
+</head>
+
+<body>
+<div th:replace="common::#bgDiv"></div>
+
+<div class="container" style="height: 700px">
+    <h3 class="page-header">
+        <span>新闻查看</span> <small><span><a th:href="@{/news/admin}" class="col-md-offset-8">返回管理员家园</a></span></small>
+    </h3>
+
+    <div class="row">
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>新闻标题</th>
+                <th>新闻时间</th>
+                <th>机构</th>
+                <th>删除 / 修改</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="news : ${pageInfo.list}" th:object="${news}">
+                <td ><a th:href="@{/news/details/{id}(id=${news.id})}"><span th:text="*{title}"></span></a></td>
+                <td ><span th:text="*{date}"></span></td>
+                <td ><span th:text="*{company}"></span></td>
+                <td>
+                    <a class="deleteBtn" th:attr="newsid=${news.id}" th:href="@{/news/delete/{id}(id=${news.id})}"><span class="glyphicon glyphicon-trash"></span></a>
+                    &nbsp;&nbsp;
+                    <a  th:href="@{/news/update/{id}(id=${news.id})}"><span class="glyphicon glyphicon-pencil"></span></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row">
+        <div class="col col-md-6 col-sm-6 col-xs-6">
+            新闻总记录数：<span th:text="${pageInfo.total}"></span>总页数：<span th:text="${pageInfo.pages}"></span>当前页：<span th:text="${pageInfo.pageNum}"></span>
+        </div>
+        <div class="col col-md-6 col-sm-6 col-xs-6">
+            <nav >
+                <ul class="pagination">
+                    <li><a href="#" th:href="@{/news/page/{pageNum}(pageNum=1)}" th:if="${pageInfo.pageNum} &gt; 1">首页</a></li>
+                    <li>
+                        <a href="#" th:href="@{/news/page/{pageNum}(pageNum=${pageInfo.pageNum}-1)}" th:if="${pageInfo.pageNum} &gt; 1">
+                            <span >&laquo;</span>
+                        </a>
+                    </li>
+                    <li><a href="#" th:text="${pageInfo.pageNum}-2" th:href="@{/news/page/{pageNum}(pageNum=${pageInfo.pageNum}-2)}" th:if="${pageInfo.pageNum}-2 &gt; 0">1</a></li>
+                    <li><a href="#" th:text="${pageInfo.pageNum}-1" th:href="@{/news/page/{pageNum}(pageNum=${pageInfo.pageNum}-1)}" th:if="${pageInfo.pageNum}-1 &gt; 0">2</a></li>
+                    <li><a href="#" th:text="${pageInfo.pageNum}" th:href="@{/news/page/{pageNum}(pageNum=${pageInfo.pageNum})}">3</a></li>
+                    <li><a href="#" th:text="${pageInfo.pageNum}+1" th:href="@{/news/page/{pageNum}(pageNum=${pageInfo.pageNum}+1)}" th:if="${pageInfo.pageNum}+1 &lt; ${pageInfo.pages}+1">4</a></li>
+                    <li><a href="#" th:text="${pageInfo.pageNum}+2" th:href="@{/news/page/{pageNum}(pageNum=${pageInfo.pageNum}+2)}" th:if="${pageInfo.pageNum}+2 &lt; ${pageInfo.pages}+1">5</a></li>
+                    <li>
+                        <a href="#" th:href="@{/news/page/{pageNum}(pageNum=${pageInfo.pageNum}+1)}" th:if="${pageInfo.pageNum} &lt; ${pageInfo.pages}">
+                            <span >&raquo;</span>
+                        </a>
+                    </li>
+                    <li><a href="#" th:href="@{/news/page/{pageNum}(pageNum=${pageInfo.pages})}" th:if="${pageInfo.pageNum} &lt; ${pageInfo.pages}">尾页</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+</div>
+</body>
+<script>
+    $(function(){
+        $(".deleteBtn").click(function () {
+            if(confirm("真的要删除吗？")){
+                $.ajax({
+                    url:"/news/delete/"+$(this).attr("newsid"),
+                    success:function (data) {
+                        if("success"==data){
+                            location.reload();
+                        }else{
+                            alert("服务器繁忙，删除失败，请稍后再试");
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>
+</html>

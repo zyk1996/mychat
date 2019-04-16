@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common::head(~{::#title})">
+    <title id="title">唠唠嗑</title>
+
+</head>
+
+<body>
+<div th:replace="common::#bgDiv"></div>
+<div class="container" style="height: 700px">
+
+    <div class="row" style="margin: 15% auto">
+        <div class="col col-md-offset-5 col-sm-offset-5 col-xs-offset-5">
+            <span>提示：点击“立即开通”扫码支付完成后便可成为VIP</span><br>
+            <img src="/images/pay.png" alt="支付二维码" class="img-thumbnail" style="margin: 20px auto">
+            <div><a th:href="@{/user/updateFlagVip}" class="btn btn-success col-md-offset-2 col-sm-offset-2 col-xs-offset-2">立即开通</a></div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
