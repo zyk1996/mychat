@@ -103,7 +103,7 @@
                     if(result.code==200){
                         modalHide("#addUserModal");
                     }else{
-                        alert(errorMsg);
+                        pnotify("错误信息",errorMsg,"error")
                     }
                 }
             });

@@ -49,8 +49,30 @@ public class NewsController {
     @RequestMapping("/details/{id}")
     public String newsDetails(@PathVariable("id")Long id,Model model){
         News result1=iNewsService.selectById(id);
+        Integer result2=iNewsService.addCount(id);
+        if(result2==1){
+            System.out.println("id为"+id+"的新闻浏览次数成功增加1");
+        }else{
+            System.err.println("id为"+id+"的新闻浏览次数加1失败");
+        }
         model.addAttribute("news",result1);
         return "news_details";
+    }
+    @RequestMapping("/page/count/{pageNum}")
+    public String pageNewsCount(@PathVariable("pageNum")Integer pageNum,Model model){
+        PageHelper.startPage(pageNum,CommonConstant.DEFAULT_NEWS_PAGE_SIZE);
+        List<ShortNews> result1=iNewsService.selectAllShortNewsCount();
+        PageInfo pageInfo=new PageInfo(result1);
+        model.addAttribute("pageInfo",pageInfo);
+        return "user_news_count";
+    }
+    @RequestMapping("/page/date/{pageNum}")
+    public String pageNewsDate(@PathVariable("pageNum")Integer pageNum,Model model){
+        PageHelper.startPage(pageNum,CommonConstant.DEFAULT_NEWS_PAGE_SIZE);
+        List<ShortNews> result1=iNewsService.selectAllShortNews();
+        PageInfo pageInfo=new PageInfo(result1);
+        model.addAttribute("pageInfo",pageInfo);
+        return "user_news_date";
     }
     @RequestMapping("/page/{pageNum}")
     public String pageNews(@PathVariable("pageNum")Integer pageNum,Model model){

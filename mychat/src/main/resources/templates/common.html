@@ -2,10 +2,31 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="/css/font-awesome.css" th:href="@{/css/font-awesome.css}"/>
+    <link rel="stylesheet" href="/css/pnotify.css" th:href="@{/css/pnotify.css}"/>
+    <link rel="stylesheet" href="/css/pnotify.buttons.css" th:href="@{/css/pnotify.buttons.css}"/>
+    <link rel="stylesheet" href="/css/pnotify.brighttheme.css" th:href="@{/css/pnotify.brighttheme.css}"/>
     <script type="text/javascript" src="/js/jquery.js" th:src="@{/js/jquery.js}"></script>
     <script type="text/javascript" src="/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
-    <link rel="stylesheet" href="/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}"/>
-    <link href="/images/a.ico" rel="icon" type="image/x-icon" th:href="@{/images/a.ico}"/>
+    <script type="text/javascript" src="/js/pnotify.js" th:src="@{/js/pnotify.js}"></script>
+    <script type="text/javascript" src="/js/pnotify.buttons.js" th:src="@{/js/pnotify.buttons.js}"></script>
+    <script type="text/javascript" src="/js/pnotify.animate.js" th:src="@{/js/pnotify.animate.js}"></script>
+    <script>
+        function pnotify(title,text,type) {
+            return new PNotify({
+                title: title,
+                text: text,
+                <!--可选项 notice info success error -->
+                type: type,
+                styling: "brighttheme",
+                <!--可选项 slow normal fast -->
+                animate_speed: "normal",
+                <!-- 提示停留时间，单位毫秒-->
+                delay: 3000
+            });
+        }
+    </script>
     <title th:replace="${title}">mychat</title>
     <style type="text/css">
         a:hover{

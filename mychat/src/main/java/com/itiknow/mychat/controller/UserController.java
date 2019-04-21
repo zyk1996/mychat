@@ -31,6 +31,7 @@ public class UserController {
 
     @RequestMapping("/info")
     public String userInfo(){
+
         return "userInfo";
     }
     @RequestMapping("/home")

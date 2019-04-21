@@ -6,6 +6,8 @@ import com.itiknow.mychat.service.IMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class MessageServiceImpl implements IMessageService {
     @Autowired
@@ -13,5 +15,15 @@ public class MessageServiceImpl implements IMessageService {
     @Override
     public Integer insert(Message message) {
         return messageMapper.insert(message);
+    }
+
+    @Override
+    public List<Message> selectUserMessage(String accountFrom, String accountTo) {
+        return messageMapper.selectUserMessage(accountFrom,accountTo);
+    }
+
+    @Override
+    public List<Message> selectRoomMessage(String room) {
+        return messageMapper.selectRoomMessage(room);
     }
 }

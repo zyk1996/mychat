@@ -42,8 +42,8 @@
 
             <div id="menu" class="row">
                 <div class="btn-group btn-group-justified" style="width: 100%;padding-top: 10px">
-                    <a id="messagesBtn" type="button" class="btn btn-default"  title="消息"><span class="glyphicon glyphicon-comment" ></span></a>
-                    <a id="friendsBtn" type="button" class="btn btn-default"  title="朋友"><span class="glyphicon glyphicon-user" ></span></a>
+                    <a id="messagesBtn" type="button" class="btn btn-default change"  title="消息"><span class="glyphicon glyphicon-comment" ></span></a>
+                    <a id="friendsBtn" type="button" class="btn btn-default change"  title="朋友"><span class="glyphicon glyphicon-user" ></span></a>
                     <a id="friendspaceBtn" type="button" class="btn btn-default"  title="朋友圈"><span class="glyphicon glyphicon-cloud" ></span></a>
                     <a id="newsBtn" type="button" class="btn btn-default"  title="新闻"><span class="glyphicon glyphicon-globe" ></span></a>
                 </div>
@@ -53,14 +53,12 @@
             <div id="result" class="row">
                 <ul class="list-group" id="messages"></ul>
                 <ul class="list-group" id="friends"></ul>
-                <ul class="list-group" id="friendspace"></ul>
-                <ul class="list-group" id="news"></ul>
 
             </div>
         </div>
 
         <div id="right" class="col col-md-9 col-xs-9 col-sm-9" style="background-color: #dddddd;height:100%">
-            <div id="name" style="text-align: center;font-size: large"><span flag="span">详细信息</span> <span flag="toggle" class="glyphicon glyphicon-menu-down"></span></div>
+            <div id="name" style="text-align: center;font-size: large"><span flag="span">未选中好友或群聊</span> <span flag="toggle" class="glyphicon glyphicon-menu-down"></span></div>
             <hr/>
             <div style="height: 500px">
                 <div flag="img" style="height: 200px;overflow-y: auto;">
@@ -83,19 +81,39 @@
     </div>
 
 </div>
+<form action="/news/page/date/1" id="newsForm"></form>
+<form th:action="@{/space/getAll/page/{account}/1(account=${session.user.account})}" action="" id="spaceAllForm"></form>
 </body>
 <script th:inline="javascript">
     $(function () {
         var errorMSG="服务器繁忙，请稍后再试";
         var account=[[${session.user.account}]];
         var user=[[${session.user}]];
+        $("#menu a:eq(0)").click(function () {
+            clean();
+            $("#result ul").css("display","none");
+            $("#result ul:eq(0)").css("display","block");
+        });
+        $("#menu a:eq(1)").click(function () {
+            clean();
+            $("#result ul").css("display","none");
+            $("#result ul:eq(1)").css("display","block");
+        });
+        $("#newsBtn").click(function () {
+            $("#newsForm").submit();
+        });
+        $("#friendspaceBtn").click(function () {
+            $("#spaceAllForm").submit();
+        });
         $("#sendMessageBtn").click(function () {
             if(typeof($(this).attr("accountFrom"))=="undefined"){
-                alert("发送消息之前请先选定朋友或群聊");
+                var text="发送消息之前请先选定朋友或群聊";
+                pnotify("请注意操作规范",text,"error");
             }else{
                 var textarea=$("#right [flag='content']");
                 if(textarea.val()==""){
-                    alert("不能发送内容为空的消息");
+                    var text="不能发送内容为空的消息";
+                    pnotify("请注意操作规范",text,"error");
                 }else{
                     var message={};
                     message.accountFrom=$(this).attr("accountFrom");
@@ -120,7 +138,7 @@
                                $("#right [flag='message']").append(p);
                                $("#right [flag='content']").val("");
                            }else{
-                               alert(errorMSG);
+                               pnotify("错误信息",errorMSG,"error");
                            }
                         }
                     });
@@ -136,9 +154,9 @@
             $.ajax({
                 url:"/user/getRoomsAndFriends/"+account,
                 success:function (result) {
+                    var target=$("#friends");
                     if(result.code==200){
                         //console.log(result.hashMap);
-                        var target=$("#friends");
 
                         if(result.hashMap.rooms.length>0){
                             var span=$("<span></span>").text("群聊");
@@ -148,16 +166,10 @@
                                 var img=$("<img style='width: 50px;height: 50px'></img>").attr("src",data.image).attr("alt","头像");
                                 var room=$("<span></span>").text(data.room);
                                 li.append(img).append("&nbsp;&nbsp;").append(room);
-
                                 li.on("click",function () {
                                     clean();
-                                    $("#right").find("[flag='span']").text(data.room+"   "+"("+data.users.length+")");
-                                    $.each(data.users,function (index1,data1) {
-                                        var img1=$("<img style='width: 80px;height: 80px'></img>").attr("src",data1.image).attr("alt","头像");
-                                        $("#right").find("[flag='img']").append(img1);
-                                    });
-                                    $("#sendMessageBtn").attr("accountFrom",account).attr("accountTo",data.room).attr("type","0").attr("flagRoom","1").attr("room",data.room);
-
+                                    initRightRoom(data,account);
+                                    messageAjax("/message/room/"+data.room,account);
                                 });
                                 target.append(li);
                             });
@@ -172,20 +184,15 @@
                                 li.append(img).append("&nbsp;&nbsp;").append(accountSpan);
                                 li.on("click",function () {
                                     clean();
-                                    $("#right").find("[flag='span']").text(data.account);
-                                    var img1=$("<img style='width: 80px;height: 80px'></img>").attr("src",data.image).attr("alt","头像");
-                                    $("#right").find("[flag='img']").append(img1);
-                                    $("#sendMessageBtn").attr("accountFrom",account).attr("accountTo",data.account).attr("type","0").attr("flagRoom","0");
+                                    initRightUser(data,account);
+                                    messageAjax("/message/user/"+account+"/"+data.account,account);
                                 });
                                 target.append(li);
                             });
                         }
-                        if(result.hashMap.users.length==0&&result.hashMap.rooms.length==0){
-                            var span=$("<span></span>").text("你还未添加任何群聊和好友，快去找寻你的小伙伴吧");
-                            target.append(span);
-                        }
                     }else{
-                        alert(errorMSG);
+                        var span=$("<span></span>").text("你还未添加任何群聊和好友，快去找寻你的小伙伴吧");
+                        target.append(span);
                     }
                 }
             });
@@ -213,64 +220,127 @@
         ws.onmessage=function (ev) {
             var data=JSON.parse(ev.data);
             console.log(data);
-            if($("#messages").children("a[unique='"+data.unique+"']").length>0){
-                var li=$("#messages").children("a[unique='"+data.unique+"']");
-                var cli=li.clone(true);
-                li.remove();
-                cli.find("span[point='content']").text(data.content);
-                var count=cli.find("span.badge").text();
-                cli.find("span.badge").text(parseInt(count)+1);
-                $("#messages").prepend(cli);
+            if($("#sendMessageBtn").attr("unique")==data.unique){
+                var p=$("<p></p>");
+                var img=$("<img style='height: 50px;width: 50px'></img>").attr("src",data.fromObject.image).attr("alt","头像");
+                var span=$("<span></span>").text(data.content);
+                p.append(img).append(span);
+                $("#right [flag='message']").append(p);
             }else{
-                var li=$("<a class='list-group-item' ></a>").attr("unique",data.unique);
-                var img=$("<img style='width: 50px;height: 50px'></img>").attr("src",data.fromObject.image).attr("alt","头像");
-                var message=$("<span point='content'></span>").text(data.content);
-                var badge=$("<span class='badge'></span>").text("1");
-                var account=$("<span point='account'></span>");
-                if(data.flagRoom=="0"){
-                    account.text(data.accountFrom);
+                if($("#messages").children("a[unique='"+data.unique+"']").length>0){
+                    var li=$("#messages").children("a[unique='"+data.unique+"']");
+                    var cli=li.clone(true);
+                    li.remove();
+                    cli.find("span[point='content']").text(data.content);
+                    var count=cli.find("span.badge").text();
+                    cli.find("span.badge").text(parseInt(count)+1);
+                    $("#messages").prepend(cli);
                 }else{
-                    account.text(data.room);
-                }
-                li.append(img).append("&nbsp;&nbsp;").append(account).append(badge).append("<br/>").append(message);
-                if(data.type=="1"){
-                    var btn1=$("<button class='btn btn-default'>忽略</button>");
-                    var btn2=$("<button class='btn btn-info'>同意</button>");
-                    var span=$("<span></span>");
+                    var li=$("<a class='list-group-item' ></a>").attr("unique",data.unique);
+                    var img=$("<img style='width: 50px;height: 50px'></img>").attr("src",data.fromObject.image).attr("alt","头像");
+                    var message=$("<span point='content'></span>").text(data.content);
+                    var badge=$("<span class='badge'></span>").text("1");
+                    var accountSpan=$("<span point='account'></span>");
                     if(data.flagRoom=="0"){
-                        span.text("好友申请验证");
-                    }else{
-                        span.text("群消息验证");
-                    }
-                    btn1.on("click",function () {
-                        btn1.closest("a").remove();
-                    });
-                    btn2.on("click",function () {
-                        var userrel={};
-                        userrel.primaryAccount=data.accountFrom;
-                        userrel.secondaryAccount=data.accountTo;
-                        $.ajax({
-                            url:"/user/userrel/add",
-                            data:userrel,
-                            success:function (result) {
-                                if(result.code==200){
-                                    alert("添加好友成功");
-                                    btn2.closest("a").remove();
-                                }else{
-                                    alert(errorMSG);
-                                }
-                            }
+                        accountSpan.text(data.accountFrom);
+                        li.on("click",function () {
+                            clean();
+                            initRightUser(data.fromObject,account);
+                            messageAjax("/message/user/"+account+"/"+data.accountFrom,account);
+
                         });
-                    });
-                    li.append(span).append(btn1).append(btn2);
+                    }else{
+                        accountSpan.text(data.room);
+                        li.on("click",function () {
+                            clean();
+                            initRightRoom(data.fromObject,account);
+                            messageAjax("/message/room/"+data.room,account);
+                        });
+                    }
+                    li.append(img).append("&nbsp;&nbsp;").append(accountSpan).append(badge).append("<br/>").append(message);
+                    if(data.type=="1"){
+                        var btn1=$("<button class='btn btn-default'>忽略</button>");
+                        var btn2=$("<button class='btn btn-info'>同意</button>");
+                        var span=$("<span></span>");
+                        if(data.flagRoom=="0"){
+                            span.text("好友申请验证");
+                        }else{
+                            span.text("群消息验证");
+                        }
+                        btn1.on("click",function () {
+                            btn1.closest("a").remove();
+                        });
+                        btn2.on("click",function () {
+                            var userrel={};
+                            userrel.primaryAccount=data.accountFrom;
+                            userrel.secondaryAccount=data.accountTo;
+                            $.ajax({
+                                url:"/user/userrel/add",
+                                data:userrel,
+                                success:function (result) {
+                                    if(result.code==200){
+                                        var text="添加好友成功";
+                                        pnotify("操作成功",text,"success");
+                                        btn2.closest("a").remove();
+                                    }else{
+                                        pnotify("错误信息",errorMSG,"error");
+                                    }
+                                }
+                            });
+                        });
+                        li.append(span).append(btn1).append(btn2);
+                    }
+                    $("#messages").prepend(li);
                 }
-                $("#messages").prepend(li);
             }
         }
 
     });
+    function messageAjax(url,account){
+        $.ajax({
+            url:url,
+            success:function (result1) {
+                if(result1.code==200){
+                    initMessage(result1.hashMap.messages,account);
+                    console.log(result1.hashMap.messages);
+                }
+            }
+        });
+    }
+    function initMessage(messages,account){
+        $.each(messages,function (index,data) {
+            var img=$("<img style='width: 50px;height: 50px'></img>").attr("src",data.fromObject.image).attr("alt","头像");
+            var content=$("<span></span>").text(data.content);
+            var p=$("<p></p>");
+            if(account==data.accountFrom){
+                p.css("text-align","right");
+                p.append(content).append(img);
+            }else{
+                p.css("text-align","left");
+                p.append(img).append(content);
+            }
+            $("#right [flag='message']").append(p);
+        });
+        $("#right [flag='message']").scrollTop( $("#right [flag='message']")[0].scrollHeight );
+    }
+    function initRightRoom(data,account) {
+        $("#right").find("[flag='span']").text(data.room+"   "+"("+data.users.length+")");
+        $.each(data.users,function (index1,data1) {
+            var img1=$("<img style='width: 80px;height: 80px'></img>").attr("src",data1.image).attr("alt","头像");
+            $("#right").find("[flag='img']").append(img1);
+        });
+        $("#sendMessageBtn").attr("accountFrom",account).attr("accountTo",data.room).attr("type","0").attr("flagRoom","1").attr("room",data.room).attr("unique","1_"+data.room);
+
+    }
+    function initRightUser(data,account) {
+        $("#right").find("[flag='span']").text(data.account);
+        var img1=$("<img style='width: 80px;height: 80px'></img>").attr("src",data.image).attr("alt","头像");
+        $("#right").find("[flag='img']").append(img1);
+        $("#sendMessageBtn").attr("accountFrom",account).attr("accountTo",data.account).attr("type","0").attr("flagRoom","0").attr("unique","0_"+data.account);
+
+    }
     function clean(){
-        $("#right").find("[flag='span']").text("");
+        $("#right").find("[flag='span']").text("未选中好友或群聊");
         $("#right").find("[flag='img']").empty();
         $("#right").find("[flag='message']").empty();
         if($("#right [flag='toggle']").hasClass("glyphicon-menu-up")){
@@ -280,6 +350,7 @@
         $("#right [flag='message']").css("height","500px");
         $("#right").find("[flag='img']").hide();
         $("#sendMessageBtn").removeAttr("accountFrom").removeAttr("accountTo").removeAttr("type").removeAttr("flagRoom").removeAttr("room");
+
     }
 </script>
 </html>

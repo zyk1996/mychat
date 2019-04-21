@@ -6,6 +6,7 @@ import com.itiknow.mychat.service.IRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class RoomServiceImpl implements IRoomService {
     @Autowired
@@ -19,4 +20,5 @@ public class RoomServiceImpl implements IRoomService {
     public Integer insertRoom(Room room) {
         return roomMapper.insertRoom(room);
     }
+
 }

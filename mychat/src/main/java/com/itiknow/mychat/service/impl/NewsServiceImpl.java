@@ -32,4 +32,14 @@ public class NewsServiceImpl implements INewsService {
     public Integer deleteById(Long id) {
         return newsMapper.deleteById(id);
     }
+
+    @Override
+    public List<ShortNews> selectAllShortNewsCount() {
+        return newsMapper.selectAllShortNewsCount();
+    }
+
+    @Override
+    public Integer addCount(Long id) {
+        return newsMapper.addCount(id);
+    }
 }

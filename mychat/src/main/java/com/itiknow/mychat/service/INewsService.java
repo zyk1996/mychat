@@ -10,4 +10,8 @@ public interface INewsService {
     List<ShortNews> selectAllShortNews();
     News selectById(Long id);
     Integer deleteById(Long id);
+
+    List<ShortNews> selectAllShortNewsCount();
+
+    Integer addCount(Long id);
 }

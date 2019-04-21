@@ -30,10 +30,17 @@ public interface NewsMapper {
             @Result(column = "content",property = "content",javaType = String.class),
             @Result(column = "flag_attr",property = "flagAttr",javaType = String.class),
             @Result(column = "attr_src",property = "attrSrc",javaType = String.class),
-            @Result(column = "createtime",property = "createtime",javaType = Long.class)
-
+            @Result(column = "createtime",property = "createtime",javaType = Long.class),
+            @Result(column = "count",property = "count",javaType = Integer.class)
     })
     News selectById(@Param("id")Long id);
     @Delete("delete from news where id=#{id}")
     Integer deleteById(@Param("id")Long id);
+
+    @Select("select id,title,date,company from news order by count desc")
+    @ResultMap("shortNewsMap")
+    List<ShortNews> selectAllShortNewsCount();
+
+    @Update("update news set count=count+1 where id=#{id}")
+    Integer addCount(@Param("id") Long id);
 }

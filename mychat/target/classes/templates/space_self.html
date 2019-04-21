@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common::head(~{::#title})">
+    <title id="title">我的朋友圈</title>
+
+</head>
+
+<body>
+<div th:replace="common::#bgDiv"></div>
+
+<div class="container" style="height: 700px">
+
+    <h3 class="page-header">
+        <span>我的朋友圈</span>
+        <small><span><a class="col-md-offset-8"  th:href="@{/space/willAdd}">发表朋友圈</a></span></small>
+        &nbsp;&nbsp;
+        <small><span><a th:href="@{/user/home}" >返回个人家园</a></span></small>
+    </h3>
+
+    <div class="row" th:if="${#lists.size(pageInfo.list)} &gt; 0">
+        <div class="row">
+            <div  th:each="space :${pageInfo.list}" th:object="${space}" style="height: 300px;overflow-y: auto">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <img th:src="@{*{user.image}}" style="height: 50px;width: 50px"/><span th:text="*{user.account}">小白</span>
+                    </div>
+                    <div class="panel-body">
+                        <div th:utext="*{content}" class="content">
+                            今天很开心呀，捡到了一分钱，交到了警察叔叔手里面^-^
+                        </div>
+                        <div flag="praises" th:if="${#lists.size(space.praises)} &gt; 0">
+                            <span th:each="praise :${space.praises}" th:text="${praise.account}"></span>
+                            <span th:text="${#lists.size(space.praises)}"></span>人点了赞
+                        </div>
+                        <div class="row" th:if="${#lists.size(space.comments)} &gt; 0">
+                            <ul class="media-list">
+                                <li class="media" th:each="comment :${space.comments}" th:if="${comment.type} == '0'">
+                                    <div class="media-left">
+                                        <a href="#">
+                                            <img th:src="@{${comment.from.image}}" class="media-object" src="" alt="头像" style="width: 50px;height: 50px;">
+                                        </a>
+
+                                    </div>
+                                    <div class="media-body">
+                                        <p class="media-heading"><span th:text="${comment.from.account}"></span> 评论了：</p>
+                                        <div th:utext="${comment.content}"></div>
+                                    </div>
+                                </li>
+                                <li class="media" th:each="comment :${space.comments}" th:if="${comment.type} == '1'">
+                                    <div class="media-left">
+                                        <a href="#">
+                                            <img th:src="@{${comment.from.image}}" class="media-object" src="" alt="头像" style="width: 50px;height: 50px;">
+                                        </a>
+
+                                    </div>
+                                    <div class="media-body">
+                                        <p class="media-heading"><span th:text="${comment.from.account}"></span> 回复了 <span th:text="${comment.to.account}"></span>：</p>
+                                        <div th:utext="${comment.content}"></div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                        </div>
+                        <div><span th:text="*{datetime}">2019-04-19 10:17:34</span>
+                            <span th:text="*{addr}" th:if="*{flagAddr} == '1'"></span><br>
+                            <a class="btn btn-danger col-md-offset-10 deleteBtn" th:attr="spaceid=${space.id}" >删除</a>&nbsp;&nbsp;
+                            <a class="btn btn-success " th:href="@{/space/willUpdate/{id}(id=${space.id})}">编辑</a>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col col-md-6 col-sm-6 col-xs-6">
+                朋友圈总条数：<span th:text="${pageInfo.total}"></span>总页数：<span th:text="${pageInfo.pages}"></span>当前页：<span th:text="${pageInfo.pageNum}"></span>
+            </div>
+            <div class="col col-md-6 col-sm-6 col-xs-6">
+                <nav >
+                    <ul class="pagination">
+                        <li><a href="#" th:href="@{/space/getSelf/page/{account}/{pageNum}(pageNum=1,account=${session.user.account})}" th:if="${pageInfo.pageNum} &gt; 1">首页</a></li>
+                        <li>
+                            <a href="#" th:href="@{/space/getSelf/page/{account}/{pageNum}(pageNum=${pageInfo.pageNum}-1,account=${session.user.account})}" th:if="${pageInfo.pageNum} &gt; 1">
+                                <span >&laquo;</span>
+                            </a>
+                        </li>
+                        <li><a href="#" th:text="${pageInfo.pageNum}-2" th:href="@{/space/getSelf/page/{account}/{pageNum}(pageNum=${pageInfo.pageNum}-2,account=${session.user.account})}" th:if="${pageInfo.pageNum}-2 &gt; 0">1</a></li>
+                        <li><a href="#" th:text="${pageInfo.pageNum}-1" th:href="@{/space/getSelf/page/{account}/{pageNum}(pageNum=${pageInfo.pageNum}-1,account=${session.user.account})}" th:if="${pageInfo.pageNum}-1 &gt; 0">2</a></li>
+                        <li><a href="#" th:text="${pageInfo.pageNum}" th:href="@{/space/getSelf/page/{account}/{pageNum}(pageNum=${pageInfo.pageNum},account=${session.user.account})}">3</a></li>
+                        <li><a href="#" th:text="${pageInfo.pageNum}+1" th:href="@{/space/getSelf/page/{account}/{pageNum}(pageNum=${pageInfo.pageNum}+1,account=${session.user.account})}" th:if="${pageInfo.pageNum}+1 &lt; ${pageInfo.pages}+1">4</a></li>
+                        <li><a href="#" th:text="${pageInfo.pageNum}+2" th:href="@{/space/getSelf/page/{account}/{pageNum}(pageNum=${pageInfo.pageNum}+2,account=${session.user.account})}" th:if="${pageInfo.pageNum}+2 &lt; ${pageInfo.pages}+1">5</a></li>
+                        <li>
+                            <a href="#" th:href="@{/space/getSelf/page/{account}/{pageNum}(pageNum=${pageInfo.pageNum}+1,account=${session.user.account})}" th:if="${pageInfo.pageNum} &lt; ${pageInfo.pages}">
+                                <span >&raquo;</span>
+                            </a>
+                        </li>
+                        <li><a href="#" th:href="@{/space/getSelf/page/{account}/{pageNum}(pageNum=${pageInfo.pages},account=${session.user.account})}" th:if="${pageInfo.pageNum} &lt; ${pageInfo.pages}">尾页</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div th:unless="${#lists.size(pageInfo.list)} &gt; 0" class="row">
+        你还未发过朋友圈
+    </div>
+
+</div>
+</body>
+<script>
+    $(function () {
+        $(".deleteBtn").click(function () {
+            $.ajax({
+                url:"/space/delete/"+$(this).attr("spaceid"),
+                success:function (result) {
+                    if(result.code==200){
+                        var text="删除成功";
+                        pnotify("操作成功",text,"success");
+                        setTimeout(function () {
+                            location.reload();
+                        },3000);
+                    }else{
+                        var text="服务器异常，删除失败，请稍后再试";
+                        pnotify("错误信息",text,"error");
+                    }
+                }
+            });
+        });
+    });
+</script>
+</html>

@@ -12,6 +12,7 @@ public class News {
     private String flagAttr;
     private String attrSrc;
     private Long createtime;
+    private Integer count;
 
     @Override
     public String toString() {

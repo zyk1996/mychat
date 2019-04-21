@@ -2,6 +2,8 @@ package com.itiknow.mychat.entity;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class Space {
     private Long id;
@@ -13,4 +15,8 @@ public class Space {
     private String addr;
     private String flagAttr;
     private String attrSrc;
+    private User user;
+    private List<Comment> comments;
+    private List<Praise> praises;
+
 }

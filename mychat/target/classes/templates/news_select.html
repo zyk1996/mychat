@@ -29,7 +29,7 @@
                 <td ><span th:text="*{date}"></span></td>
                 <td ><span th:text="*{company}"></span></td>
                 <td>
-                    <a class="deleteBtn" th:attr="newsid=${news.id}" th:href="@{/news/delete/{id}(id=${news.id})}"><span class="glyphicon glyphicon-trash"></span></a>
+                    <a class="deleteBtn" th:attr="newsid=${news.id}" ><span class="glyphicon glyphicon-trash"></span></a>
                     &nbsp;&nbsp;
                     <a  th:href="@{/news/update/{id}(id=${news.id})}"><span class="glyphicon glyphicon-pencil"></span></a>
                 </td>
@@ -77,9 +77,14 @@
                     url:"/news/delete/"+$(this).attr("newsid"),
                     success:function (data) {
                         if("success"==data){
-                            location.reload();
+                            var text="成功删除一条新闻";
+                            pnotify("操作成功",text,"success");
+                            setTimeout(function () {
+                                location.reload();
+                            },3000);
                         }else{
-                            alert("服务器繁忙，删除失败，请稍后再试");
+                            var text="服务器繁忙，删除失败，请稍后再试";
+                            pnotify("错误信息",text,"error");
                         }
                     }
                 });

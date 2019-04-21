@@ -12,4 +12,6 @@ public class Comment {
     private Long createtime;
     //type属性表示评价类型 ‘0’表示评论 ‘1’表示回复
     private String type;
+    private User from;
+    private User to;
 }
